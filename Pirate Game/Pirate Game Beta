@@ -1,0 +1,113 @@
+#imports:
+import pygame, random, time, os, math
+pygame.font.init()
+from contextlib import redirect_stderr
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+pygame.init()
+SCREEN_WIDTH, SCREEN_HEIGHT = 900, 500
+WINDOW = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+BACKGROUND = pygame.image.load('Background1.png').convert()
+BACKGROUND = pygame.transform.scale(BACKGROUND, (SCREEN_WIDTH, SCREEN_HEIGHT))
+BACKGROUND2 = pygame.image.load('Background2.png').convert()
+BACKGROUND2 = pygame.transform.scale(BACKGROUND2, (SCREEN_WIDTH, SCREEN_HEIGHT))
+NEW_DAY_BUTTON = pygame.image.load('New_Day_Button.png')
+black = (0, 0, 0)
+bg_width = BACKGROUND.get_width()
+show_ui = True
+font = pygame.font.Font(None , 80)
+day = 0
+
+pygame.display.set_caption("Pirate Game")
+
+
+new_day_button = button.Button(675 ,425 , NEW_DAY_BUTTON, 7)
+
+class CreateCrewmate:
+    def __init__(self, name):
+            self.name = name
+            self.hunger = random.randint(5,10)
+
+    def ShowCrewmate(self):
+        print(self.name + ":")
+        print("Hunger: "+str(self.hunger))
+    
+    def CrewmateNewDay(self, Crew, crew_names):
+        self.hunger -= 1
+
+def Draw_Window(scroll, scroll2):
+    WINDOW.blit(BACKGROUND, (scroll, 0))
+    WINDOW.blit(BACKGROUND2, (scroll2, 0))
+
+    
+
+
+def ShowCrew(Crew, crew_names):
+    for i in range(0, len(crew_names)):
+        Crew[crew_names[i]].ShowCrewmate()
+
+def NewDay(Crew, crew_names):
+    show_ui = False
+    global day 
+    day += 1
+    day_message = font.render('Day '+ str(day), False, black)
+    WINDOW.blit(day_message, (400, 200))
+    pygame.display.update()
+    time.sleep(1)
+    show_ui = True
+    print("Day: "+ str(day))
+    for i in range(0, len(crew_names)):
+        Crew[crew_names[i]].CrewmateNewDay(Crew, crew_names)
+    ShowCrew(Crew, crew_names)
+
+def main():
+    scroll = 0
+    scroll2 = 0 + bg_width
+    Crew = {}
+    names = ["Luke", "Ben", "Monty"]
+    crew_names = []
+    day = 0
+    os.system('clear')
+    print("Welcome to the pirate game! Generating Crew: ")
+
+    for i in range(0,3):
+        random_name = names[random.randint(0, len(names)-1)]
+        crew_names.append(random_name)
+        names.remove(random_name)
+        Crew.update({crew_names[i]: CreateCrewmate(crew_names[i])})
+        Crew[crew_names[i]].ShowCrewmate()
+
+
+    a = input("Press enter to start" )
+    os.system('clear')
+    NewDay(Crew, crew_names)  
+
+    FPS = 30
+    clock = pygame.time.Clock()
+    run = True
+    while run:
+        
+        clock.tick(FPS)
+
+        Draw_Window(scroll, scroll2)
+        scroll -= 2
+        scroll2 -= 2
+        if abs(scroll) > bg_width:
+            scroll = bg_width
+        if abs(scroll2) > bg_width:
+            scroll2 = bg_width
+        
+        if show_ui == True:
+            if new_day_button.draw(WINDOW):
+                NewDay(Crew, crew_names)
+        
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+        
+        
+        pygame.display.update()
+    pygame.quit()
+
+if __name__ == '__main__':
+    main()
